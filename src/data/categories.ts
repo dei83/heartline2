@@ -1,0 +1,32 @@
+export const messageCategories = {
+    popular: [
+        { name: "Happy Birthday", value: "Birthday", color: "bg-pink-100 text-pink-700 hover:bg-pink-200" },
+        { name: "Belated Birthday", value: "Belated Birthday", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
+        { name: "Anniversary", value: "Anniversary", color: "bg-red-100 text-red-700 hover:bg-red-200" },
+        { name: "Thank You", value: "Thank You", color: "bg-teal-100 text-teal-700 hover:bg-teal-200" },
+        { name: "Thinking of You", value: "Thinking of You", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
+        { name: "Wedding & Engagement", value: "Wedding", color: "bg-purple-100 text-purple-700 hover:bg-purple-200" },
+    ],
+    other: [
+        { name: "Pet Sympathy", value: "Pet Sympathy" },
+        { name: "Sorry", value: "Sorry" },
+        { name: "Encouragement", value: "Encouragement" },
+        { name: "Goodbye & Good Luck", value: "Goodbye" },
+        { name: "Friendship", value: "Friendship" },
+        { name: "Get Well Soon", value: "Get Well Soon" },
+        { name: "Love You", value: "Love You" },
+        { name: "I Miss You", value: "Miss You" },
+        { name: "Just Because", value: "Just Because" },
+        { name: "Sympathy", value: "Sympathy" },
+        { name: "Say Congrats", value: "Congrats" },
+        { name: "New Pet", value: "New Pet" },
+        { name: "New Baby & Gender Reveal", value: "New Baby" },
+        { name: "New Job", value: "New Job" },
+        { name: "Graduation", value: "Graduation" },
+        { name: "New Home", value: "New Home" },
+        { name: "Work Anniversary", value: "Work Anniversary" },
+        { name: "Bar & Bat Mitzvah", value: "Religious Milestone" },
+        { name: "First Communion & Confirmation", value: "Religious Milestone" },
+        { name: "Retirement", value: "Retirement" },
+    ]
+};
