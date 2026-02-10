@@ -11,6 +11,7 @@ interface AuthContextType {
     userProfile: UserProfile | null;
     loading: boolean;
     signInWithGoogle: () => Promise<void>;
+    signInWithEmail: (email: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType>({
     userProfile: null,
     loading: true,
     signInWithGoogle: async () => { },
+    signInWithEmail: async () => { },
     logout: async () => { },
 });
 
@@ -100,12 +102,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) console.error("Error logging in:", error);
     };
 
+    const signInWithEmail = async (email: string) => {
+        const { error } = await supabase.auth.signInWithOtp({
+            email,
+            options: {
+                // set this to false if you do not want the user to be automatically signed up
+                shouldCreateUser: true,
+                emailRedirectTo: `${window.location.origin}/auth/callback`,
+            },
+        });
+        if (error) {
+            console.error("Error logging in:", error);
+            throw error;
+        }
+    };
+
     const logout = async () => {
         await supabase.auth.signOut();
     };
 
     return (
-        <AuthContext.Provider value={{ user, userProfile, loading, signInWithGoogle, logout }}>
+        <AuthContext.Provider value={{ user, userProfile, loading, signInWithGoogle, signInWithEmail, logout }}>
             {children}
         </AuthContext.Provider>
     );

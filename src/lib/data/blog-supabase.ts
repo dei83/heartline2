@@ -2,21 +2,33 @@ import { createClient } from "@/lib/supabase/client";
 import { BlogPost } from "@/types";
 import { blogPosts as localPosts } from "@/data/blog";
 
-export async function getBlogPosts(): Promise<BlogPost[]> {
+export async function getBlogPosts(tag?: string): Promise<BlogPost[]> {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        if (tag) {
+            return localPosts.filter(post => post.tags.includes(tag));
+        }
         return localPosts;
     }
 
     const supabase = createClient();
     try {
-        const { data, error } = await supabase
+        let query = supabase
             .from('posts')
             .select('*')
             .eq('published', true)
             .order('published_at', { ascending: false });
 
+        if (tag) {
+            query = query.contains('tags', [tag]);
+        }
+
+        const { data, error } = await query;
+
         if (error || !data || data.length === 0) {
             console.warn("Supabase blog fetch failed or empty. Using local fallback.");
+            if (tag) {
+                return localPosts.filter(post => post.tags.includes(tag));
+            }
             return localPosts;
         }
 
@@ -33,6 +45,9 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         }));
     } catch (err) {
         console.error("Unexpected error fetching blog posts:", err);
+        if (tag) {
+            return localPosts.filter(post => post.tags.includes(tag));
+        }
         return localPosts;
     }
 }

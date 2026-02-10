@@ -1,16 +1,27 @@
 import Link from "next/link";
 import { getBlogPosts } from "@/lib/data/blog-supabase";
 
-export default async function BlogIndexPage() {
-    const posts = await getBlogPosts();
+export default async function BlogIndexPage({ searchParams }: { searchParams: Promise<{ tag?: string }> }) {
+    const { tag } = await searchParams;
+    const posts = await getBlogPosts(tag);
 
     return (
         <div className="container mx-auto py-12 px-4">
             <div className="text-center max-w-2xl mx-auto mb-16">
-                <h1 className="text-4xl font-bold tracking-tight mb-4 text-primary-900">Heartline Blog</h1>
+                <h1 className="text-4xl font-bold tracking-tight mb-4 text-primary-900">
+                    {tag ? `${tag} Posts` : "Heartline Blog"}
+                </h1>
                 <p className="text-lg text-muted-foreground">
-                    Tips, guides, and stories about building better relationships and communicating with intention.
+                    {tag
+                        ? `Curated articles about ${tag} and communication.`
+                        : "Tips, guides, and stories about building better relationships and communicating with intention."
+                    }
                 </p>
+                {tag && (
+                    <Link href="/blog" className="inline-block mt-4 text-sm text-primary hover:underline">
+                        ← View All Posts
+                    </Link>
+                )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

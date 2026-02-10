@@ -28,5 +28,10 @@ export const messageCategories = {
         { name: "Bar & Bat Mitzvah", value: "Religious Milestone" },
         { name: "First Communion & Confirmation", value: "Religious Milestone" },
         { name: "Retirement", value: "Retirement" },
+        { name: "Workplace: Praise & Thanks", value: "Workplace Appreciation" },
+        { name: "Workplace: Difficult Conversations", value: "Workplace Difficult" },
+        { name: "Apologies & Conflicts", value: "Apology" },
+        { name: "Long Distance", value: "Long Distance" },
+        { name: "Breakups", value: "Breakup" },
     ]
 };

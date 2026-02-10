@@ -3,14 +3,16 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Eye, Pen } from "lucide-react";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 
 export default function BlogEditorPage() {
     const params = useParams(); // May be empty for new
     const router = useRouter();
     const supabase = createClient();
     const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
 
     // Form State
     const [title, setTitle] = useState("");
@@ -68,6 +70,36 @@ export default function BlogEditorPage() {
         setLoading(false);
     };
 
+    const handleGenerate = async () => {
+        const topic = window.prompt("What topic should I write about?");
+        if (!topic) return;
+
+        setLoading(true);
+        try {
+            const response = await fetch("/api/admin/blog/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ topic }),
+            });
+            const data = await response.json();
+
+            if (data.success && data.draft) {
+                setTitle(data.draft.title);
+                setSlug(data.draft.slug);
+                setExcerpt(data.draft.excerpt);
+                setContent(data.draft.content);
+                setCoverImage(data.draft.coverImage);
+                setTags(data.draft.tags.join(", "));
+            } else {
+                alert("Failed to generate draft");
+            }
+        } catch (error) {
+            alert("Error generating draft");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="container mx-auto py-10 px-4 max-w-4xl">
             <div className="flex justify-between items-center mb-6">
@@ -75,6 +107,13 @@ export default function BlogEditorPage() {
                     <ArrowLeft className="w-4 h-4 mr-2" /> Back
                 </Link>
                 <div className="flex gap-2">
+                    <button
+                        onClick={handleGenerate}
+                        disabled={loading}
+                        className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 disabled:opacity-50"
+                    >
+                        ✨ Generate with AI
+                    </button>
                     <button
                         onClick={handleSave}
                         disabled={loading}
@@ -141,14 +180,41 @@ export default function BlogEditorPage() {
                     </div>
                 </div>
 
-                {/* Content - Markdown Editor Placeholder */}
+                {/* Content - Markdown Editor & Preview */}
                 <div>
-                    <label className="block text-sm font-medium mb-1">Content (Markdown)</label>
-                    <textarea
-                        value={content} onChange={e => setContent(e.target.value)}
-                        className="w-full p-4 border rounded-md h-96 font-mono text-sm" placeholder="# Write your post here..."
-                    />
-                    <p className="text-xs text-muted-foreground mt-2">Supports Markdown formatting.</p>
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="block text-sm font-medium">Content (Markdown)</label>
+                        <div className="flex bg-gray-100 rounded-lg p-1">
+                            <button
+                                onClick={() => setActiveTab('write')}
+                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${activeTab === 'write' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}
+                            >
+                                <span className="flex items-center gap-1"><Pen className="w-3 h-3" /> Write</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('preview')}
+                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${activeTab === 'preview' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}
+                            >
+                                <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> Preview</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {activeTab === 'write' ? (
+                        <>
+                            <textarea
+                                value={content} onChange={e => setContent(e.target.value)}
+                                className="w-full p-4 border rounded-md h-96 font-mono text-sm" placeholder="# Write your post here..."
+                            />
+                            <p className="text-xs text-muted-foreground mt-2">Supports Markdown formatting.</p>
+                        </>
+                    ) : (
+                        <div className="w-full p-6 border rounded-md min-h-[24rem] bg-gray-50 overflow-y-auto max-h-96">
+                            <article className="prose prose-sm max-w-none dark:prose-invert">
+                                <ReactMarkdown>{content || "*Nothing to preview yet...*"}</ReactMarkdown>
+                            </article>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

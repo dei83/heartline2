@@ -6,7 +6,7 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { getDashboardStats, getUpcomingEventsServer } from "@/lib/data/contacts-server";
 
 export default async function DashboardPage() {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -32,6 +32,23 @@ export default async function DashboardPage() {
                 {/* Right Column: Quick Actions & Other widgets (1/3 width) */}
                 <div className="space-y-8">
                     <QuickActions />
+
+                    {/* Admin Tools (Visible to all in dev mode for testing) */}
+                    <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">Admin Tools</h3>
+                        <a
+                            href="/admin/messages"
+                            className="block w-full text-center py-2 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium mb-2"
+                        >
+                            Manage Content Engine →
+                        </a>
+                        <a
+                            href="/admin/blog"
+                            className="block w-full text-center py-2 px-4 bg-white text-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                        >
+                            Manage Blog Posts →
+                        </a>
+                    </div>
 
                     {/* Placeholder for future widgets like "Relationship Health" */}
                     <div className="bg-gradient-to-br from-rose-100 to-indigo-100 dark:from-rose-900/20 dark:to-indigo-900/20 p-6 rounded-2xl border border-rose-200 dark:border-rose-900/50">

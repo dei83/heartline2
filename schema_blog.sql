@@ -1,3 +1,12 @@
+-- Helper Function for Updated At (Required for Trigger)
+create or replace function public.handle_updated_at() 
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
 -- 5. BLOG POSTS (CMS)
 create table public.posts (
   id uuid default uuid_generate_v4() primary key,

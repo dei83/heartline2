@@ -16,8 +16,12 @@ export interface PublicMessage {
     category: string; // Birthday, Anniversary, etc.
     tags: string[];
     tone?: "Casual" | "Neutral" | "Professional" | "Warm" | "Witty" | "Sincere" | "Humorous" | "Supportive" | "Playful" | "Trendy" | "Sarcastic" | "Empowering" | "Practical" | "Romantic" | "Grateful" | "Somber" | "Festive" | "Celebratory" | "Sarcastic-Affectionate" | "Cheeky" | "Stoic" | "Firm" | "Complimentary" | "Affectionate" | "Respectful" | string;
+    emotionalIntensity?: "Low" | "Medium" | "High";
+    riskLevel?: "Safe" | "Medium" | "Risky";
+    length?: "Short" | "Medium" | "Long";
     source?: string; // e.g. "Reddit r/funny"
     likes: number;
+    copyCount?: number;
 }
 
 // We also keep the generic Message type for compatibility if needed, 

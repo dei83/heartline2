@@ -2,29 +2,32 @@
 
 import { Message } from "@/types";
 import { Copy, Heart } from "lucide-react";
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 interface MessageCardProps {
     message: Message;
 }
 
 export function MessageCard({ message }: MessageCardProps) {
-    const [copied, setCopied] = useState(false);
-
-    const handleCopy = () => {
+    const handleCopy = async () => {
         navigator.clipboard.writeText(message.content);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        toast.success("Message copied to clipboard!");
+
+        // Track copy analytics (Fire and forget)
+        try {
+            await fetch('/api/messages/copy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: message.id })
+            });
+        } catch (err) {
+            console.error("Failed to track copy", err);
+        }
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -5 }}
-            transition={{ duration: 0.3 }}
-            className="rounded-xl border bg-card text-card-foreground shadow-sm p-5 flex flex-col justify-between h-full hover:shadow-lg transition-all"
+        <div
+            className="rounded-xl border bg-card text-card-foreground shadow-sm p-5 flex flex-col justify-between h-full hover:shadow-lg transition-all hover:-translate-y-1 duration-300"
         >
             <div>
                 <div className="flex justify-between items-start mb-3">
@@ -64,9 +67,8 @@ export function MessageCard({ message }: MessageCardProps) {
                     aria-label="Copy message"
                 >
                     <Copy className="w-5 h-5 text-muted-foreground group-hover:text-blue-600 transition-colors" />
-                    {copied && <span className="text-xs text-blue-600 font-bold animate-pulse">Copied!</span>}
                 </button>
             </div>
-        </motion.div>
+        </div>
     );
 }

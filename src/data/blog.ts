@@ -81,7 +81,7 @@ Your words have power. Use them to build bridges, lift spirits, and show the peo
 `,
         author: "Heartline Editorial",
         coverImage: "https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=2070&auto=format&fit=crop",
-        tags: ["Relationships", "Communication", "Guide"],
+        tags: ["Psychology", "Relationships", "Communication"],
         publishedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
     },
     {
@@ -141,7 +141,7 @@ Friendship is a verb. It requires action. But the action doesn't have to be gran
 `,
         author: "Heartline Science Team",
         coverImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=2069&auto=format&fit=crop",
-        tags: ["Science", "Friendship", "Tips"],
+        tags: ["Psychology", "Friendship", "Science"],
         publishedAt: new Date(Date.now() - 432000000).toISOString(), // 5 days ago
     },
     {
@@ -209,7 +209,7 @@ Say something. Keep it simple. Show up. That is enough.
 `,
         author: "Heartline Editorial",
         coverImage: "https://images.unsplash.com/photo-1499209971180-41bb712d0a11?q=80&w=2070&auto=format&fit=crop",
-        tags: ["Grief", "Support", "Guide"],
+        tags: ["Real Stories", "Culture", "Grief"],
         publishedAt: new Date(Date.now() - 864000000).toISOString(), // 10 days ago
     },
     {
@@ -330,7 +330,7 @@ Distance is just a geography test. If you can master communication, trust, and i
 `,
         author: "Heartline Editorial",
         coverImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop",
-        tags: ["LDR", "Long Distance", "Love"],
+        tags: ["Real Stories", "Relationships", "LDR"],
         publishedAt: new Date(Date.now() - 1728000000).toISOString(),
     },
     {
@@ -386,7 +386,7 @@ Watch how it changes your relationships—and your own mood.
 `,
         author: "Heartline Wellness",
         coverImage: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=2068&auto=format&fit=crop",
-        tags: ["Wellness", "Mental Health", "Gratitude"],
+        tags: ["Psychology", "Wellness", "Gratitude"],
         publishedAt: new Date(Date.now() - 2200000000).toISOString(),
     },
     {
@@ -428,7 +428,7 @@ Stop thinking of it as "networking." Think of it as "making friends." You like h
 `,
         author: "Heartline Career",
         coverImage: "https://images.unsplash.com/photo-1515169067750-d51a73b05121?q=80&w=2070&auto=format&fit=crop",
-        tags: ["Career", "Networking", "Introverts"],
+        tags: ["Relationships", "Career", "Introverts"],
         publishedAt: new Date(Date.now() - 3000000000).toISOString(),
     },
     {
@@ -539,7 +539,7 @@ The goal isn't to be poetic. The goal is to be present. The simple fact that you
 `,
         author: "Heartline Editorial",
         coverImage: "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=2073&auto=format&fit=crop",
-        tags: ["Grief", "Writing Guide", "Sympathy"],
+        tags: ["Culture", "Etiquette", "Grief"],
         publishedAt: new Date(Date.now() - 4000000000).toISOString(),
     },
     {

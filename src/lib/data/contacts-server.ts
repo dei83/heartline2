@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Contact } from "@/types";
 
 export async function getContactsServer(userId: string): Promise<Contact[]> {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check if we have a user (though userId is passed, we need the client to be auth'd? 
     // Actually createClient() in server.ts handles cookies, so it should be auth'd if the user is logged in)

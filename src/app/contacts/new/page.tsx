@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { ContactForm } from "@/components/contacts/ContactForm";
 
 export default async function NewContactPage() {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {

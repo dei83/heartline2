@@ -19,7 +19,7 @@ export async function getPublicMessages(
             .select('*')
             .order('created_at', { ascending: false });
 
-        if (category && category !== "All Events") {
+        if (category && category !== "All Occasions") {
             query = query.eq('category', category);
         }
 

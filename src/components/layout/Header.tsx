@@ -65,9 +65,35 @@ export function Header() {
                             </div>
                         </div>
 
-                        <Link href="/blog" className="text-foreground/70 hover:text-primary transition-colors">
-                            Blog
-                        </Link>
+                        {/* Blog Dropdown */}
+                        <div className="relative group">
+                            <button className="flex items-center gap-1 text-foreground/70 hover:text-primary transition-colors focus:outline-none">
+                                Blog <ChevronDown className="w-4 h-4" />
+                            </button>
+
+                            <div className="absolute left-0 top-full mt-2 w-56 bg-white border border-border rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden transform origin-top-left">
+                                <div className="py-2">
+                                    <Link href="/blog" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-50 hover:text-primary transition-colors font-semibold border-b border-gray-100">
+                                        All Posts
+                                    </Link>
+                                    <Link href="/blog?tag=Psychology" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-50 hover:text-primary transition-colors">
+                                        Psychology & Science
+                                    </Link>
+                                    <Link href="/blog?tag=Real Stories" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-50 hover:text-primary transition-colors">
+                                        Real Stories
+                                    </Link>
+                                    <Link href="/blog?tag=Data Insights" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-50 hover:text-primary transition-colors">
+                                        Data Insights (Reddit)
+                                    </Link>
+                                    <Link href="/blog?tag=Relationships" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-50 hover:text-primary transition-colors">
+                                        Relationship Dynamics
+                                    </Link>
+                                    <Link href="/blog?tag=Culture" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-gray-50 hover:text-primary transition-colors">
+                                        Culture & Etiquette
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
                     </nav>
                 </div>
 

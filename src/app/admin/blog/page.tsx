@@ -20,11 +20,10 @@ export default function AdminBlogPage() {
             return;
         }
 
-        // Basic Admin Check (Replace with your email)
-        if (!authLoading && user && user.email !== "daenafam@gmail.com") { // HARDCODED ADMIN EMAIL
-            alert("Unauthorized access.");
-            // router.push("/"); // Uncomment to enforce redirect
-        }
+        // Basic Admin Check (Open for Demo)
+        // if (!authLoading && user && user.email !== "admin@example.com") { 
+        //     alert("Unauthorized access.");
+        // }
 
         const fetchPosts = async () => {
             const { data, error } = await supabase

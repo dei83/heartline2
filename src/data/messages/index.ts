@@ -3,10 +3,20 @@ import { popularMessages } from "./popular";
 import { supportMessages } from "./support";
 import { socialMessages } from "./social";
 import { celebrationMessages } from "./celebration";
+import { workplaceMessages } from "./workplace";
+import { relationshipMessages } from "./relationships";
+import { longMessages } from "./long-messages";
+import { missYouMessages } from "./miss-you";
+import { expandedMessages } from "./expanded-set";
 
 export const defaultMessages: Omit<PublicMessage, "id" | "likes">[] = [
     ...popularMessages,
     ...supportMessages,
     ...socialMessages,
-    ...celebrationMessages
+    ...celebrationMessages,
+    ...workplaceMessages,
+    ...relationshipMessages,
+    ...longMessages,
+    ...missYouMessages,
+    ...expandedMessages
 ];

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,39 +14,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-export const metadata: Metadata = {
-  title: {
-    default: "Heartline - Meaningful Messages & Relationship CRM",
-    template: "%s | Heartline"
-  },
-  description: "Find the perfect words for every moment. Heartline helps you manage relationships, remember important dates, and send AI-crafted messages.",
-  keywords: ["CRM", "Relationship Management", "Birthday Wishes", "Anniversary Messages", "Message Generator", "AI Messages"],
-  authors: [{ name: "Heartline Team" }],
-  creator: "Heartline",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://heartline.app",
-    title: "Heartline - Meaningful Messages",
-    description: "Connect meaningfully with AI-crafted messages and relationship management tools.",
-    siteName: "Heartline",
-    images: [
-      {
-        url: "/og-image.jpg", // Needs to be added to public folder
-        width: 1200,
-        height: 630,
-        alt: "Heartline App",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Heartline - Meaningful Messages",
-    description: "Connect meaningfully with AI-crafted messages.",
-    creator: "@heartlineapp",
-  },
-};
 
 export default function RootLayout({
   children,
@@ -58,6 +26,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col font-sans`}
       >
         <AuthProvider>
+          <Toaster position="top-center" richColors />
           <Header />
           <main className="flex-1">
             {children}

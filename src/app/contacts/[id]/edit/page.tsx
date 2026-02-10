@@ -4,7 +4,7 @@ import { ContactForm } from "@/components/contacts/ContactForm";
 import { Contact } from "@/types";
 
 export default async function EditContactPage({ params }: { params: Promise<{ id: string }> }) {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
