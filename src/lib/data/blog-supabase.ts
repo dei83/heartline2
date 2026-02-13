@@ -13,35 +13,36 @@ export async function getBlogPosts(tag?: string): Promise<BlogPost[]> {
     const supabase = createClient();
     try {
         let query = supabase
-            .from('posts')
+            .from('articles')
             .select('*')
-            .eq('published', true)
+            .eq('status', 'published')
             .order('published_at', { ascending: false });
 
         if (tag) {
-            query = query.contains('tags', [tag]);
+            query = query.contains('secondary_keywords', [tag]);
         }
 
         const { data, error } = await query;
 
         if (error || !data || data.length === 0) {
-            console.warn("Supabase blog fetch failed or empty. Using local fallback.");
+            console.warn("Supabase blog fetch failed or empty. Using local fallback.", error?.message);
             if (tag) {
                 return localPosts.filter(post => post.tags.includes(tag));
             }
+            // If DB is empty, return local posts to ensure site isn't empty
             return localPosts;
         }
 
-        return data.map(post => ({
-            id: post.id,
-            title: post.title,
-            slug: post.slug,
-            excerpt: post.excerpt,
-            content: post.content,
-            author: post.author,
-            coverImage: post.cover_image,
-            tags: post.tags || [],
-            publishedAt: post.published_at || post.created_at
+        return data.map(article => ({
+            id: article.id,
+            title: article.title,
+            slug: article.slug,
+            excerpt: article.excerpt,
+            content: article.body, // Map body -> content
+            author: (article.author && !article.author.includes('@')) ? article.author : 'Heartline Editorial',
+            coverImage: article.featured_image_url, // Map featured_image_url -> coverImage
+            tags: article.secondary_keywords || [], // Map secondary_keywords -> tags
+            publishedAt: article.published_at || article.created_at
         }));
     } catch (err) {
         console.error("Unexpected error fetching blog posts:", err);
@@ -60,12 +61,13 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | undefi
     const supabase = createClient();
     try {
         const { data, error } = await supabase
-            .from('posts')
+            .from('articles')
             .select('*')
             .eq('slug', slug)
             .single();
 
         if (error || !data) {
+            console.warn(`Blog post not found in DB for slug: ${slug}, checking local.`);
             return localPosts.find(p => p.slug === slug);
         }
 
@@ -74,13 +76,14 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | undefi
             title: data.title,
             slug: data.slug,
             excerpt: data.excerpt,
-            content: data.content,
-            author: data.author,
-            coverImage: data.cover_image,
-            tags: data.tags || [],
+            content: data.body,
+            author: (data.author && !data.author.includes('@')) ? data.author : 'Heartline Editorial',
+            coverImage: data.featured_image_url,
+            tags: data.secondary_keywords || [],
             publishedAt: data.published_at || data.created_at
         };
     } catch (err) {
+        console.error("Error fetching single post:", err);
         return localPosts.find(p => p.slug === slug);
     }
 }

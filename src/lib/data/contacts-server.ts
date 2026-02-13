@@ -16,8 +16,10 @@ export async function getContactsServer(userId: string): Promise<Contact[]> {
         .eq('user_id', userId)
         .order('name', { ascending: true });
 
+    console.log(`Fetching contacts for ${userId}... Found ${data?.length || 0} records.`);
+
     if (error) {
-        console.error('Error fetching contacts (server):', error);
+        console.error('Error fetching contacts (server):', JSON.stringify(error, null, 2));
         return [];
     }
 

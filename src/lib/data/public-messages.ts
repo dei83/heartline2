@@ -4,11 +4,12 @@ import { defaultMessages } from "@/data/messages";
 
 export async function getPublicMessages(
     category?: string,
-    tone?: string
+    tone?: string,
+    tag?: string
 ): Promise<PublicMessage[]> {
     // Offline fallback check
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        return getLocalMessages(category, tone);
+        return getLocalMessages(category, tone, tag);
     }
 
     const supabase = createClient();
@@ -27,11 +28,15 @@ export async function getPublicMessages(
             query = query.eq('tone', tone);
         }
 
+        if (tag) {
+            query = query.contains('tags', [tag]);
+        }
+
         const { data, error } = await query;
 
         if (error || !data || data.length === 0) {
-            console.warn("Supabase public_messages fetch failed or empty. Using local fallback.");
-            return getLocalMessages(category, tone);
+            // console.warn("Supabase public_messages fetch failed or empty. Using local fallback.");
+            return getLocalMessages(category, tone, tag);
         }
 
         return data.map(msg => ({
@@ -41,11 +46,11 @@ export async function getPublicMessages(
 
     } catch (err) {
         console.error("Unexpected error fetching messages:", err);
-        return getLocalMessages(category, tone);
+        return getLocalMessages(category, tone, tag);
     }
 }
 
-function getLocalMessages(category?: string, tone?: string): PublicMessage[] {
+function getLocalMessages(category?: string, tone?: string, tag?: string): PublicMessage[] {
     let filtered = defaultMessages;
 
     if (category && category !== "All Events") {
@@ -59,6 +64,10 @@ function getLocalMessages(category?: string, tone?: string): PublicMessage[] {
         filtered = filtered.filter(msg =>
             msg.tone?.toLowerCase().includes(tone.toLowerCase())
         );
+    }
+
+    if (tag) {
+        filtered = filtered.filter(msg => msg.tags?.includes(tag));
     }
 
     return filtered.map((msg, i) => ({

@@ -8,6 +8,9 @@ import { relationshipMessages } from "./relationships";
 import { longMessages } from "./long-messages";
 import { missYouMessages } from "./miss-you";
 import { expandedMessages } from "./expanded-set";
+import { mothersDayMessages } from "./mothers-day";
+import { congratsMessages } from "./congrats";
+import { newBabyMessages } from "./new-baby";
 
 export const defaultMessages: Omit<PublicMessage, "id" | "likes">[] = [
     ...popularMessages,
@@ -18,5 +21,8 @@ export const defaultMessages: Omit<PublicMessage, "id" | "likes">[] = [
     ...relationshipMessages,
     ...longMessages,
     ...missYouMessages,
-    ...expandedMessages
+    ...expandedMessages,
+    ...mothersDayMessages,
+    ...congratsMessages,
+    ...newBabyMessages
 ];

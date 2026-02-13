@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { User, LogOut, Settings, ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { messageCategories } from "@/data/categories";
+import { MESSAGE_GROUPS } from "@/data/categories";
 
 export function Header() {
     const { user, logout } = useAuth();
@@ -17,57 +17,40 @@ export function Header() {
                         <span className="text-2xl font-bold text-primary tracking-tight">Heartline</span>
                     </Link>
                     <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+                        {MESSAGE_GROUPS.map((group) => (
+                            <div key={group.name} className="relative group">
+                                <button className="flex items-center gap-1 text-foreground/70 hover:text-primary transition-colors focus:outline-none py-2">
+                                    {group.shortName} <ChevronDown className="w-4 h-4" />
+                                </button>
 
-                        {/* Mega Menu Dropdown */}
-                        <div className="relative group">
-                            <button className="flex items-center gap-1 text-foreground/70 hover:text-primary transition-colors focus:outline-none">
-                                Messages <ChevronDown className="w-4 h-4" />
-                            </button>
+                                <div className="absolute left-0 top-full mt-2 w-56 bg-white border border-border rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden transform origin-top-left">
+                                    <div className="py-2">
+                                        <Link
+                                            href={`/messages?group=${encodeURIComponent(group.name)}`}
+                                            className="block px-4 py-2 text-sm font-semibold text-foreground/80 hover:bg-gray-50 hover:text-primary transition-colors border-b border-gray-100"
+                                        >
+                                            All {group.shortName}
+                                        </Link>
 
-                            {/* Mega Menu Content */}
-                            <div className="absolute left-0 top-full mt-2 w-[600px] bg-white border border-border rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden transform origin-top-left">
-                                <div className="flex">
-                                    {/* Popular Column */}
-                                    <div className="w-1/3 bg-gray-50 p-6 border-r border-border/50">
-                                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Popular</h3>
-                                        <div className="space-y-3">
-                                            {messageCategories.popular.map((category) => (
+                                        <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+                                            {group.categories.map((cat) => (
                                                 <Link
-                                                    key={category.name}
-                                                    href={`/messages?category=${encodeURIComponent(category.value)}`}
-                                                    className="block text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                                                    key={cat.name}
+                                                    href={`/messages?category=${encodeURIComponent(cat.value)}`}
+                                                    className="block px-4 py-2 text-sm text-foreground/70 hover:bg-gray-50 hover:text-primary transition-colors truncate"
                                                 >
-                                                    {category.name}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Other Occasions Column (Grid) */}
-                                    <div className="w-2/3 p-6">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">All Occasions</h3>
-                                            <Link href="/messages" className="text-xs text-primary hover:underline">View All</Link>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-                                            {messageCategories.other.map((category) => (
-                                                <Link
-                                                    key={category.name}
-                                                    href={`/messages?category=${encodeURIComponent(category.value)}`}
-                                                    className="text-sm text-foreground/70 hover:text-primary truncate transition-colors"
-                                                >
-                                                    {category.name}
+                                                    {cat.name}
                                                 </Link>
                                             ))}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        ))}
 
                         {/* Blog Dropdown */}
                         <div className="relative group">
-                            <button className="flex items-center gap-1 text-foreground/70 hover:text-primary transition-colors focus:outline-none">
+                            <button className="flex items-center gap-1 text-foreground/70 hover:text-primary transition-colors focus:outline-none py-2">
                                 Blog <ChevronDown className="w-4 h-4" />
                             </button>
 

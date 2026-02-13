@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Plus, Edit, Trash, ExternalLink } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function AdminBlogPage() {
     const [posts, setPosts] = useState<any[]>([]);
@@ -15,36 +16,95 @@ export default function AdminBlogPage() {
     const supabase = createClient();
 
     useEffect(() => {
-        if (!authLoading && !user) {
+        if (authLoading) return;
+
+        if (!user) {
             router.push("/login?redirect=/admin/blog");
             return;
         }
 
-        // Basic Admin Check (Open for Demo)
-        // if (!authLoading && user && user.email !== "admin@example.com") { 
-        //     alert("Unauthorized access.");
-        // }
-
         const fetchPosts = async () => {
-            const { data, error } = await supabase
-                .from('posts')
-                .select('*')
-                .order('created_at', { ascending: false });
+            try {
+                const response = await fetch('/api/admin/blog/list');
+                const result = await response.json();
 
-            if (data) setPosts(data);
-            setLoading(false);
+                if (!response.ok) {
+                    throw new Error(result.error || "Failed to fetch posts");
+                }
+
+                if (result.posts) {
+                    setPosts(result.posts);
+                }
+            } catch (error: any) {
+                console.error("Error fetching posts:", error);
+                toast.error("Failed to load posts: " + error.message);
+            } finally {
+                setLoading(false);
+            }
         };
 
-        if (user) fetchPosts();
-
+        fetchPosts();
     }, [user, authLoading, router]);
 
-    if (loading || authLoading) return <div className="p-10 text-center">Loading admin dashboard...</div>;
+    const handleMigrate = async () => {
+        if (!confirm("This will copy all posts from the old database to the new one. Continue?")) return;
+
+        setLoading(true);
+        try {
+            const { data: oldPosts, error: fetchError } = await supabase.from('posts').select('*');
+            if (fetchError) throw fetchError;
+
+            if (!oldPosts || oldPosts.length === 0) {
+                alert("No old posts found to migrate.");
+                setLoading(false);
+                return;
+            }
+
+            let count = 0;
+            for (const post of oldPosts) {
+                const article = {
+                    id: post.id,
+                    title: post.title,
+                    slug: post.slug,
+                    excerpt: post.excerpt,
+                    body: post.content,
+                    featured_image_url: post.cover_image,
+                    status: post.published ? 'published' : 'draft',
+                    secondary_keywords: post.tags,
+                    published_at: post.published_at,
+                    created_at: post.created_at,
+                    updated_at: post.updated_at || new Date().toISOString(),
+                    pillar: 'general',
+                    content_type: 'article',
+                    author: user?.email || 'Admin'
+                };
+
+                const { error: insertError } = await supabase.from('articles').upsert(article);
+                if (insertError) console.error(`Failed to migrate ${post.title}`, insertError);
+                else count++;
+            }
+
+            alert(`Migration complete! Moved ${count} posts.`);
+            window.location.reload();
+        } catch (e: any) {
+            alert("Migration failed: " + e.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (authLoading) return <div className="p-10 text-center">Checking authentication...</div>;
+    if (loading) return <div className="p-10 text-center">Loading posts...</div>;
 
     return (
         <div className="container mx-auto py-10 px-4">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold">Blog Management</h1>
+                <div>
+                    <h1 className="text-3xl font-bold">Blog Management</h1>
+                    <button onClick={handleMigrate} className="text-xs text-blue-500 hover:text-blue-700 underline mt-1">
+                        Migrate Legacy Posts
+                    </button>
+                </div>
                 <Link href="/admin/blog/new" className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90">
                     <Plus className="w-4 h-4" /> New Post
                 </Link>
@@ -68,8 +128,8 @@ export default function AdminBlogPage() {
                                     <div className="text-xs text-muted-foreground">{post.slug}</div>
                                 </td>
                                 <td className="py-3 px-4">
-                                    <span className={`text-xs px-2 py-1 rounded-full ${post.published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                        {post.published ? 'Published' : 'Draft'}
+                                    <span className={`text-xs px-2 py-1 rounded-full ${post.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                        {post.status === 'published' ? 'Published' : 'Draft'}
                                     </span>
                                 </td>
                                 <td className="py-3 px-4 text-sm text-gray-500">

@@ -1,37 +1,73 @@
+export const MESSAGE_GROUPS = [
+    {
+        name: "Celebrations",
+        shortName: "Celebrations",
+        description: "Mark life's big moments with joy.",
+        icon: "Gift",
+        color: "bg-pink-50 text-pink-600",
+        categories: [
+            { name: "Happy Birthday", value: "Birthday" },
+            { name: "Anniversary", value: "Anniversary" },
+            { name: "Wedding & Engagement", value: "Wedding" },
+            { name: "New Baby & Gender Reveal", value: "New Baby" },
+            { name: "Graduation", value: "Graduation" },
+            { name: "New Home", value: "New Home" },
+            { name: "Religious Milestones", value: "Religious Milestone" },
+        ]
+    },
+    {
+        name: "Love & Connection",
+        shortName: "Love",
+        description: "Strengthen bonds with heartfelt words.",
+        icon: "Heart",
+        color: "bg-red-50 text-red-600",
+        categories: [
+            { name: "Thank You", value: "Thank You" },
+            { name: "Thinking of You", value: "Thinking of You" },
+            { name: "Love You", value: "Love You" },
+            { name: "Friendship", value: "Friendship" },
+            { name: "I Miss You", value: "Miss You" },
+            { name: "Just Because", value: "Just Because" },
+            { name: "Long Distance", value: "Long Distance" },
+        ]
+    },
+    {
+        name: "Support & Comfort",
+        shortName: "Support",
+        description: "Offer kindness when it's needed most.",
+        icon: "HandHeart",
+        color: "bg-blue-50 text-blue-600",
+        categories: [
+            { name: "Sympathy", value: "Sympathy" },
+            { name: "Pet Sympathy", value: "Pet Sympathy" },
+            { name: "Get Well Soon", value: "Get Well Soon" },
+            { name: "Encouragement", value: "Encouragement" },
+            { name: "Apologies", value: "Apology" },
+            { name: "Breakups", value: "Breakup" },
+        ]
+    },
+    {
+        name: "Work & Life",
+        shortName: "Work",
+        description: "Professional and social etiquette.",
+        icon: "Briefcase",
+        color: "bg-slate-50 text-slate-600",
+        categories: [
+            { name: "New Job", value: "New Job" },
+            { name: "Workplace Appreciation", value: "Workplace Appreciation" },
+            { name: "Work Anniversary", value: "Work Anniversary" },
+            { name: "Retirement", value: "Retirement" },
+            { name: "Goodbye & Good Luck", value: "Goodbye" },
+            { name: "Professional", value: "Professional" }
+        ]
+    }
+];
+
 export const messageCategories = {
-    popular: [
-        { name: "Happy Birthday", value: "Birthday", color: "bg-pink-100 text-pink-700 hover:bg-pink-200" },
-        { name: "Belated Birthday", value: "Belated Birthday", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
-        { name: "Anniversary", value: "Anniversary", color: "bg-red-100 text-red-700 hover:bg-red-200" },
-        { name: "Thank You", value: "Thank You", color: "bg-teal-100 text-teal-700 hover:bg-teal-200" },
-        { name: "Thinking of You", value: "Thinking of You", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
-        { name: "Wedding & Engagement", value: "Wedding", color: "bg-purple-100 text-purple-700 hover:bg-purple-200" },
-    ],
+    popular: MESSAGE_GROUPS[0].categories,
     other: [
-        { name: "Pet Sympathy", value: "Pet Sympathy" },
-        { name: "Sorry", value: "Sorry" },
-        { name: "Encouragement", value: "Encouragement" },
-        { name: "Goodbye & Good Luck", value: "Goodbye" },
-        { name: "Friendship", value: "Friendship" },
-        { name: "Get Well Soon", value: "Get Well Soon" },
-        { name: "Love You", value: "Love You" },
-        { name: "I Miss You", value: "Miss You" },
-        { name: "Just Because", value: "Just Because" },
-        { name: "Sympathy", value: "Sympathy" },
-        { name: "Say Congrats", value: "Congrats" },
-        { name: "New Pet", value: "New Pet" },
-        { name: "New Baby & Gender Reveal", value: "New Baby" },
-        { name: "New Job", value: "New Job" },
-        { name: "Graduation", value: "Graduation" },
-        { name: "New Home", value: "New Home" },
-        { name: "Work Anniversary", value: "Work Anniversary" },
-        { name: "Bar & Bat Mitzvah", value: "Religious Milestone" },
-        { name: "First Communion & Confirmation", value: "Religious Milestone" },
-        { name: "Retirement", value: "Retirement" },
-        { name: "Workplace: Praise & Thanks", value: "Workplace Appreciation" },
-        { name: "Workplace: Difficult Conversations", value: "Workplace Difficult" },
-        { name: "Apologies & Conflicts", value: "Apology" },
-        { name: "Long Distance", value: "Long Distance" },
-        { name: "Breakups", value: "Breakup" },
+        ...MESSAGE_GROUPS[1].categories,
+        ...MESSAGE_GROUPS[2].categories,
+        ...MESSAGE_GROUPS[3].categories
     ]
 };

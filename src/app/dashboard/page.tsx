@@ -10,8 +10,11 @@ export default async function DashboardPage() {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
+        console.log("Dashboard: No user found, redirecting to login");
         redirect("/login");
     }
+
+    console.log("Dashboard: User authenticated", user.id);
 
     // Fetch data in parallel
     const [stats, events] = await Promise.all([
@@ -47,6 +50,12 @@ export default async function DashboardPage() {
                             className="block w-full text-center py-2 px-4 bg-white text-black border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
                         >
                             Manage Blog Posts →
+                        </a>
+                        <a
+                            href="/admin/research"
+                            className="block w-full text-center py-2 px-4 bg-orange-50 text-orange-900 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors text-sm font-medium mt-2"
+                        >
+                            Research Hub (New) →
                         </a>
                     </div>
 

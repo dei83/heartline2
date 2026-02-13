@@ -33,11 +33,11 @@ export async function GET() {
             risk_level: msg.riskLevel || null,
             length: msg.length || null,
             source: msg.source || null,
-            likes: msg.likes || 0,
+            // likes: msg.likes || 0,
             is_reddit_sourced: !!msg.source?.includes("r/") // Auto-tag Reddit sources
         }));
 
-        const { error } = await supabase.from('public_messages').insert(dbRows);
+        const { error } = await supabase.from('public_messages').insert(dbRows as any[]);
 
         if (error) {
             console.error("Bulk insert failed:", error);

@@ -13,60 +13,59 @@ export function MessageCard({ message }: MessageCardProps) {
         navigator.clipboard.writeText(message.content);
         toast.success("Message copied to clipboard!");
 
-        // Track copy analytics (Fire and forget)
+        // Track copy analytics
         try {
-            await fetch('/api/messages/copy', {
+            fetch('/api/messages/copy', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: message.id })
             });
-        } catch (err) {
-            console.error("Failed to track copy", err);
-        }
+        } catch (err) { console.error(err); }
     };
 
     return (
-        <div
-            className="rounded-xl border bg-card text-card-foreground shadow-sm p-5 flex flex-col justify-between h-full hover:shadow-lg transition-all hover:-translate-y-1 duration-300"
-        >
-            <div>
-                <div className="flex justify-between items-start mb-3">
-                    <span className="text-xs font-semibold px-2.5 py-1 bg-secondary text-secondary-foreground rounded-full">
-                        {message.category}
-                    </span>
-                    {message.tone && (
-                        <span className="text-[10px] uppercase font-bold text-accent-foreground tracking-wider">
-                            {message.tone}
-                        </span>
-                    )}
-                </div>
-                <div className="flex flex-wrap gap-1.5 mb-4">
+        <div className="group relative break-inside-avoid mb-4 rounded-xl border border-border bg-card text-card-foreground p-5 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
+            {/* Top Row: Category + Actions */}
+            <div className="flex justify-between items-start mb-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-secondary text-secondary-foreground rounded-md">
+                    {message.category}
+                </span>
+
+                {/* Copy Button (Top Right) */}
+                <button
+                    onClick={handleCopy}
+                    className="p-1.5 -mr-1 -mt-1 rounded-full hover:bg-secondary text-muted-foreground hover:text-primary transition-colors"
+                    aria-label="Copy message"
+                >
+                    <Copy className="w-4 h-4" />
+                </button>
+            </div>
+
+            {/* Content */}
+            <div className="mb-4">
+                <p className="text-base leading-relaxed text-foreground font-medium font-sans">
+                    "{message.content}"
+                </p>
+                {message.source && (
+                    <p className="text-[11px] text-muted-foreground mt-1.5 italic">
+                        — via {message.source}
+                    </p>
+                )}
+            </div>
+
+            {/* Footer: Tags & Like */}
+            <div className="flex items-end justify-between pt-3 border-t border-dashed border-border/50">
+                <div className="flex flex-wrap gap-1 w-full pr-2">
                     {message.tags.map((tag) => (
-                        <span key={tag} className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-md">
+                        <span key={tag} className="text-[9px] font-semibold text-muted-foreground/80 bg-secondary/50 px-1.5 py-0.5 rounded-sm">
                             #{tag}
                         </span>
                     ))}
-                    {message.source && (
-                        <span className="text-[10px] font-medium text-orange-700 bg-orange-50 px-2 py-0.5 rounded-md flex items-center gap-1 border border-orange-100">
-                            via {message.source}
-                        </span>
-                    )}
                 </div>
-                <p className="text-base md:text-lg leading-relaxed text-foreground/90 font-medium font-serif italic text-gray-700">
-                    "{message.content}"
-                </p>
-            </div>
 
-            <div className="flex justify-end gap-3 mt-5 pt-4 border-t border-dashed">
-                <button className="p-2 hover:bg-red-50 rounded-full transition-colors group" aria-label="Like message">
-                    <Heart className="w-5 h-5 text-muted-foreground group-hover:text-red-500 transition-colors" />
-                </button>
-                <button
-                    onClick={handleCopy}
-                    className="p-2 hover:bg-blue-50 rounded-full transition-colors flex items-center gap-1 group"
-                    aria-label="Copy message"
-                >
-                    <Copy className="w-5 h-5 text-muted-foreground group-hover:text-blue-600 transition-colors" />
+                {/* Like Button (Optional) */}
+                <button className="flex-shrink-0 text-muted-foreground hover:text-red-500 transition-colors">
+                    <Heart className="w-3.5 h-3.5" />
                 </button>
             </div>
         </div>
