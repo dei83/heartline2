@@ -14,20 +14,22 @@ export async function GET() {
     }
 
     // 2. Setup Admin Client to bypass RLS
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-        return NextResponse.json({ error: "Server Configuration Error: Missing Service Role Key" }, { status: 500 });
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+        console.error("API Error: Missing Supabase Env Variables", { url: !!supabaseUrl, key: !!serviceRoleKey });
+        return NextResponse.json({
+            error: "Server Configuration Error: Missing Supabase URL or Service Role Key"
+        }, { status: 500 });
     }
 
-    const adminClient = createAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        {
-            auth: {
-                autoRefreshToken: false,
-                persistSession: false
-            }
+    const adminClient = createAdminClient(supabaseUrl, serviceRoleKey, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false
         }
-    );
+    });
 
     try {
         console.time("AdminFetchPosts");
@@ -63,20 +65,19 @@ export async function POST(request: Request) {
     }
 
     // 2. Setup Admin Client
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
         return NextResponse.json({ error: "Server Configuration Error" }, { status: 500 });
     }
 
-    const adminClient = createAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        {
-            auth: {
-                autoRefreshToken: false,
-                persistSession: false
-            }
+    const adminClient = createAdminClient(supabaseUrl, serviceRoleKey, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false
         }
-    );
+    });
 
     try {
         const body = await request.json();
