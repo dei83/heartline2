@@ -1,16 +1,29 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function updateSession(request: NextRequest) {
+/**
+ * Next.js 16 Proxy Function
+ * Replaces the deprecated middleware.ts
+ */
+export async function proxy(request: NextRequest) {
     let response = NextResponse.next({
         request: {
             headers: request.headers,
         },
     })
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    // Defensive check for environment variables
+    if (!supabaseUrl || !supabaseAnonKey) {
+        console.warn("Proxy: Missing Supabase environment variables")
+        return response
+    }
+
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        supabaseUrl,
+        supabaseAnonKey,
         {
             cookies: {
                 getAll() {
@@ -31,16 +44,14 @@ export async function updateSession(request: NextRequest) {
         }
     )
 
-    // This will refresh session if needed - required for Server Components
-    // https://supabase.com/docs/guides/auth/server-side/nextjs
-    await supabase.auth.getUser()
+    try {
+        // Refresh session if needed
+        await supabase.auth.getUser()
+    } catch (e) {
+        console.error("Proxy Auth Error:", e)
+    }
 
     return response
-}
-
-export async function middleware(request: NextRequest) {
-    // console.log("Middleware running for:", request.nextUrl.pathname);
-    return await updateSession(request)
 }
 
 export const config = {
