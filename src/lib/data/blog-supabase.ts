@@ -11,7 +11,7 @@ export async function getBlogPosts(tag?: string): Promise<BlogPost[]> {
         return localPosts;
     }
 
-    const supabase = createClient();
+    const supabase = typeof window !== 'undefined' ? createBrowserClient() : await createServerClient();
     try {
         let query = supabase
             .from('articles')
@@ -34,7 +34,7 @@ export async function getBlogPosts(tag?: string): Promise<BlogPost[]> {
             return localPosts;
         }
 
-        return data.map(article => ({
+        return data.map((article: any) => ({
             id: article.id,
             title: article.title,
             slug: article.slug,
@@ -59,7 +59,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | undefi
         return localPosts.find(p => p.slug === slug);
     }
 
-    const supabase = createClient();
+    const supabase = typeof window !== 'undefined' ? createBrowserClient() : await createServerClient();
     try {
         const { data, error } = await supabase
             .from('articles')
