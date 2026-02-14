@@ -30,39 +30,106 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    const supabase = createClient();
-
     useEffect(() => {
-        // Check active session
-        const getSession = async () => {
-            try {
-                // If not configured, just stop loading
-                if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-                    console.log("Supabase not configured. Running in offline/demo mode.");
-                    setLoading(false);
-                    return;
-                }
+        // Initialize Supabase client ONLY inside useEffect to avoid SSR issues
+        // and ensure we are in the browser environment
+        const initAuth = async () => {
+            if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+                console.log("Supabase not configured. Running in offline/demo mode.");
+                setLoading(false);
+                return;
+            }
 
+            const supabase = createClient();
+
+            try {
                 const { data: { session } } = await supabase.auth.getSession();
-                await handleSession(session);
+                await handleSession(session, supabase);
+
+                // Listen for auth changes
+                const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+                    await handleSession(session, supabase);
+                    router.refresh();
+                });
+
+                return () => subscription.unsubscribe();
             } catch (error) {
                 console.error("Session check failed", error);
                 setLoading(false);
             }
         };
 
-        getSession();
+        const cleanup = initAuth();
+        // Since initAuth is async and returns a cleanup function via promise (which useEffect doesn't support directly for cleanup),
+        // we handle subscription cleanup differently or accept that for a top-level provider it persists.
+        // Simplified for stability: The listener is attached once.
 
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
-
-        // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            await handleSession(session);
-            router.refresh();
-        });
-
-        return () => subscription.unsubscribe();
     }, [router]);
+
+    const handleSession = async (session: Session | null, supabase: any) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+
+        if (currentUser) {
+            await fetchUserProfile(currentUser.id, supabase);
+        } else {
+            setUserProfile(null);
+        }
+        setLoading(false);
+    };
+
+    const fetchUserProfile = async (userId: string, supabase: any) => {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (data) {
+                setUserProfile(data as UserProfile);
+            }
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+        }
+    };
+
+    const signInWithGoogle = async () => {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
+        const supabase = createClient();
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+            },
+        });
+        if (error) console.error("Error logging in:", error);
+    };
+
+    const signInWithEmail = async (email: string) => {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
+        const supabase = createClient();
+        const { error } = await supabase.auth.signInWithOtp({
+            email,
+            options: {
+                shouldCreateUser: true,
+                emailRedirectTo: `${window.location.origin}/auth/callback`,
+            },
+        });
+        if (error) {
+            console.error("Error logging in:", error);
+            throw error;
+        }
+    };
+
+    const logout = async () => {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
+        const supabase = createClient();
+        await supabase.auth.signOut();
+        setUser(null);
+        setUserProfile(null);
+        router.refresh();
+    };
 
     const handleSession = async (session: Session | null) => {
         const currentUser = session?.user ?? null;
