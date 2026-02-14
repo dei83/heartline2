@@ -39,7 +39,7 @@ export async function getPublicMessages(
             return getLocalMessages(category, tone, tag);
         }
 
-        return data.map(msg => ({
+        return data.map((msg: any) => ({
             ...msg,
             tags: msg.tags || [],
         })) as PublicMessage[];

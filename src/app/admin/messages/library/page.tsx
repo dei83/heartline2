@@ -74,7 +74,7 @@ export default async function MessageLibraryPage({
             <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
                 {messages && messages.length > 0 ? (
                     <div className="divide-y">
-                        {messages.map((msg) => (
+                        {messages.map((msg: any) => (
                             <div key={msg.id} className="p-6 hover:bg-gray-50 transition-colors group">
                                 <div className="flex justify-between gap-6">
                                     {/* Content Area */}

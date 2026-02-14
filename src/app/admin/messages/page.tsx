@@ -64,7 +64,7 @@ export default async function AdminMessagesPage() {
             <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
                 {suggestions && suggestions.length > 0 ? (
                     <div className="divide-y">
-                        {suggestions.map((msg) => (
+                        {suggestions.map((msg: any) => (
                             <div key={msg.id} className="p-6 hover:bg-gray-50 transition-colors group">
                                 <div className="flex justify-between gap-6">
                                     {/* Content Area */}
