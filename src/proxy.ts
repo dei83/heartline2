@@ -2,56 +2,63 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 /**
- * Next.js 16 Proxy Function
- * Replaces the deprecated middleware.ts
+ * Next.js 16 Proxy
+ * Refined for maximum stability on Vercel
  */
 export async function proxy(request: NextRequest) {
-    let response = NextResponse.next({
-        request: {
-            headers: request.headers,
-        },
-    })
-
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    // Defensive check for environment variables
+    // If environment variables are missing, don't even try to initialize Supabase
     if (!supabaseUrl || !supabaseAnonKey) {
-        console.warn("Proxy: Missing Supabase environment variables")
-        return response
+        return NextResponse.next()
     }
-
-    const supabase = createServerClient(
-        supabaseUrl,
-        supabaseAnonKey,
-        {
-            cookies: {
-                getAll() {
-                    return request.cookies.getAll()
-                },
-                setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-                    response = NextResponse.next({
-                        request: {
-                            headers: request.headers,
-                        },
-                    })
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        response.cookies.set(name, value, options)
-                    )
-                },
-            },
-        }
-    )
 
     try {
-        // Refresh session if needed
-        await supabase.auth.getUser()
-    } catch (e) {
-        console.error("Proxy Auth Error:", e)
-    }
+        let response = NextResponse.next({
+            request: {
+                headers: request.headers,
+            },
+        })
 
-    return response
+        const supabase = createServerClient(
+            supabaseUrl,
+            supabaseAnonKey,
+            {
+                cookies: {
+                    getAll() {
+                        return request.cookies.getAll()
+                    },
+                    setAll(cookiesToSet) {
+                        try {
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                request.cookies.set(name, value)
+                            )
+                            response = NextResponse.next({
+                                request: {
+                                    headers: request.headers,
+                                },
+                            })
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                response.cookies.set(name, value, options)
+                            )
+                        } catch (e) {
+                            // If cookie setting fails, just proceed
+                            console.error("Proxy: cookie set error", e)
+                        }
+                    },
+                },
+            }
+        )
+
+        // Refresh session
+        await supabase.auth.getUser()
+
+        return response
+    } catch (e) {
+        console.error("Proxy: execution error", e)
+        return NextResponse.next()
+    }
 }
 
 export const config = {
@@ -62,8 +69,8 @@ export const config = {
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
          * - public (public folder)
-         * Feel free to modify this pattern to include more paths.
+         * - api (skip API routes to avoid potential loops or overhead)
          */
-        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 }
