@@ -6,11 +6,21 @@ import { NextResponse, type NextRequest } from 'next/server'
  * Refined for maximum stability on Vercel
  */
 export async function proxy(request: NextRequest) {
+    // 1. Get environment variables
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    // If environment variables are missing, don't even try to initialize Supabase
-    if (!supabaseUrl || !supabaseAnonKey) {
+    // 2. Comprehensive check for missing or invalid variables
+    const isMissing = !supabaseUrl || !supabaseAnonKey ||
+        supabaseUrl === "undefined" || supabaseAnonKey === "undefined" ||
+        supabaseUrl === "" || supabaseAnonKey === "";
+
+    if (isMissing) {
+        // Log the specific issue for Vercel logs
+        console.warn("Proxy: [Critical] Supabase configuration is missing or invalid on Vercel.");
+        console.warn(`Proxy: URL present: ${!!supabaseUrl}, Key present: ${!!supabaseAnonKey}`);
+
+        // Return early with next response to avoid crashing the whole site
         return NextResponse.next()
     }
 
@@ -51,12 +61,18 @@ export async function proxy(request: NextRequest) {
             }
         )
 
-        // Refresh session
-        await supabase.auth.getUser()
+        // 3. Safe Refresh session
+        // Using a try-catch specifically for the auth check to prevent 500
+        try {
+            await supabase.auth.getUser()
+        } catch (authError) {
+            console.error("Proxy: Auth session refresh failed:", authError)
+        }
 
         return response
     } catch (e) {
-        console.error("Proxy: execution error", e)
+        // 4. Catch-all for initialization or other runtime errors
+        console.error("Proxy: unexpected execution error:", e)
         return NextResponse.next()
     }
 }
