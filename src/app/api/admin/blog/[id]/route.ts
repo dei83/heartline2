@@ -72,20 +72,19 @@ export async function PATCH(
     }
 
     // 2. Setup Admin Client
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
         return NextResponse.json({ error: "Server Configuration Error" }, { status: 500 });
     }
 
-    const adminClient = createAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        {
-            auth: {
-                autoRefreshToken: false,
-                persistSession: false
-            }
+    const adminClient = createAdminClient(supabaseUrl, serviceRoleKey, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false
         }
-    );
+    });
 
     try {
         const body = await request.json();
