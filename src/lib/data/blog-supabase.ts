@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/client";
+import { createClient as createBrowserClient } from "@/lib/supabase/client";
+import { createClient as createServerClient } from "@/lib/supabase/server";
 import { BlogPost } from "@/types";
 import { blogPosts as localPosts } from "@/data/blog";
 
