@@ -29,26 +29,43 @@ export const createClient = async () => {
         } as any;
     }
 
-    return createServerClient(
-        supabaseUrl,
-        supabaseAnonKey,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll()
+    try {
+        return createServerClient(
+            supabaseUrl,
+            supabaseAnonKey,
+            {
+                cookies: {
+                    getAll() {
+                        return cookieStore.getAll();
+                    },
+                    setAll(cookiesToSet) {
+                        try {
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                cookieStore.set(name, value, options)
+                            );
+                        } catch {
+                            // The `setAll` method was called from a Server Component.
+                            // This can be ignored if you have middleware refreshing
+                            // user sessions.
+                        }
+                    },
                 },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        )
-                    } catch {
-                        // The `setAll` method was called from a Server Component.
-                        // This can be ignored if you have middleware refreshing
-                        // user sessions.
-                    }
-                },
+            }
+        );
+    } catch (err) {
+        console.warn("createServerClient failed:", err);
+        return {
+            auth: {
+                getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+                getSession: () => Promise.resolve({ data: { session: null }, error: null }),
             },
-        }
-    )
-}
+            from: () => ({
+                select: () => ({
+                    eq: () => ({
+                        single: () => Promise.resolve({ data: null, error: { message: "Supabase not configured" } }),
+                    }),
+                }),
+            }),
+        } as any;
+    }
+};

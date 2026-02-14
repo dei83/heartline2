@@ -24,5 +24,25 @@ export const createClient = () => {
         } as any;
     }
 
-    return createBrowserClient(supabaseUrl, supabaseAnonKey);
+    try {
+        return createBrowserClient(supabaseUrl, supabaseAnonKey);
+    } catch (error) {
+        console.warn("createBrowserClient failed:", error);
+        return {
+            auth: {
+                getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+                onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+                signInWithOAuth: () => Promise.resolve({ error: { message: "Supabase not configured" } }),
+                signInWithOtp: () => Promise.resolve({ error: { message: "Supabase not configured" } }),
+                signOut: () => Promise.resolve({ error: null }),
+            },
+            from: () => ({
+                select: () => ({
+                    eq: () => ({
+                        single: () => Promise.resolve({ data: null, error: { message: "Supabase not configured" } }),
+                    }),
+                }),
+            }),
+        } as any;
+    }
 };
