@@ -4,7 +4,10 @@ import { BlogPost } from "@/types";
 import { blogPosts as localPosts } from "@/data/blog";
 
 export async function getBlogPosts(tag?: string): Promise<BlogPost[]> {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    // CRITICAL: Strict check for BOTH URL and Key. Vercel deployment will crash if these are missing
+    // and we try to initialize the client.
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        console.warn("Supabase credentials missing in getBlogPosts. Falling back to local data.");
         if (tag) {
             return localPosts.filter(post => post.tags.includes(tag));
         }
@@ -55,7 +58,9 @@ export async function getBlogPosts(tag?: string): Promise<BlogPost[]> {
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    // CRITICAL: Strict check for BOTH URL and Key.
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        console.warn("Supabase credentials missing in getBlogPostBySlug. Falling back to local data.");
         return localPosts.find(p => p.slug === slug);
     }
 
