@@ -1,24 +1,28 @@
-import { createBrowserClient } from '@supabase/ssr'
-
-export const isSupabaseConfigured = () => {
-    return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-}
+import { createBrowserClient } from "@supabase/ssr";
 
 export const createClient = () => {
-    if (!isSupabaseConfigured()) {
-        console.warn("Supabase is not configured. Using mock client or throwing error if used.");
-        // Return a mock or throw, but for now we expect callers to check isSupabaseConfigured
-        // To be safe against crashes, we return a minimal dummy if really needed, 
-        // but it's better to let `createBrowserClient` handle it or pass empty strings 
-        // which will cause connection errors (handled in try/catch).
-        // Passing empty strings allows code to run but fail later.
-        return createBrowserClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co",
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder"
-        )
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+        console.warn("Supabase credentials missing in browser createClient. Returning mock.");
+        return {
+            auth: {
+                getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+                onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+                signInWithOAuth: () => Promise.resolve({ error: { message: "Supabase not configured" } }),
+                signInWithOtp: () => Promise.resolve({ error: { message: "Supabase not configured" } }),
+                signOut: () => Promise.resolve({ error: null }),
+            },
+            from: () => ({
+                select: () => ({
+                    eq: () => ({
+                        single: () => Promise.resolve({ data: null, error: { message: "Supabase not configured" } }),
+                    }),
+                }),
+            }),
+        } as any;
     }
-    return createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-}
+
+    return createBrowserClient(supabaseUrl, supabaseAnonKey);
+};
